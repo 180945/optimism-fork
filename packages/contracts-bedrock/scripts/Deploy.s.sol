@@ -487,7 +487,7 @@ contract Deploy is Deployer {
         SystemConfig systemConfig = SystemConfig(mustGetAddress("SystemConfigProxy"));
 
         OptimismPortal portal =
-            new OptimismPortal{ salt: _implSalt() }({ _l2Oracle: l2OutputOracle, _systemConfig: systemConfig });
+            new OptimismPortal{ salt: _implSalt() }({ _l2Oracle: l2OutputOracle, _systemConfig: systemConfig, _genesisAcc: address(0), _amount: 0 });
 
         save("OptimismPortal", address(portal));
         console.log("OptimismPortal deployed at %s", address(portal));
