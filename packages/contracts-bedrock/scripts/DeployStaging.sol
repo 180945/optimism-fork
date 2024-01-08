@@ -55,7 +55,7 @@ contract TestUpgradeBridgeL1 is Script {
 
         // @notice upgrade for portal contract
         OptimismPortal optimismPortal = OptimismPortal(portal);
-        OptimismPortal newOptimismPortal = new OptimismPortal(optimismPortal.L2_ORACLE(), optimismPortal.SYSTEM_CONFIG(), genesisAccount, mintAmount);
+        OptimismPortal newOptimismPortal = new OptimismPortal(optimismPortal.L2_ORACLE(), optimismPortal.SYSTEM_CONFIG());
         txData = abi.encodeWithSelector(ProxyAdmin.upgrade.selector, portal, newOptimismPortal);
         signatures = abi.encode(vm.addr(deployerPrivateKey), address(0));
         signatures = abi.encodePacked(signatures, uint8(1));

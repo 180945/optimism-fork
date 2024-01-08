@@ -66,12 +66,6 @@ contract OptimismPortal is Initializable, ResourceMetering, ISemver {
     /// @notice The address of the Superchain Config contract.
     SuperchainConfig public superchainConfig;
 
-    /// @notice 180945 added logic to mint for specific account
-    address public immutable GENESIS_ACCOUNT;
-
-    /// @notice max amount mint for specific account
-    uint public immutable MINT_AMOUNT;
-
     // @notice flag check minted or not
     bool public isMinted;
 
@@ -108,11 +102,9 @@ contract OptimismPortal is Initializable, ResourceMetering, ISemver {
     /// @notice Constructs the OptimismPortal contract.
     /// @param _l2Oracle Address of the L2OutputOracle contract.
     /// @param _systemConfig Address of the SystemConfig contract.
-    constructor(L2OutputOracle _l2Oracle, SystemConfig _systemConfig, address _genesisAcc, uint _amount) {
+    constructor(L2OutputOracle _l2Oracle, SystemConfig _systemConfig) {
         L2_ORACLE = _l2Oracle;
         SYSTEM_CONFIG = _systemConfig;
-        GENESIS_ACCOUNT = _genesisAcc;
-        MINT_AMOUNT = _amount;
 
         initialize(SuperchainConfig(address(0)));
     }
@@ -175,8 +167,7 @@ contract OptimismPortal is Initializable, ResourceMetering, ISemver {
     ///         otherwise any deposited funds will be lost due to address aliasing.
     // solhint-disable-next-line ordering
     receive() external payable {
-        revert("Deposit native token not supported");
-       // depositTransaction(msg.sender, msg.value, RECEIVE_DEFAULT_GAS_LIMIT, false, bytes(""));
+        depositTransaction(msg.sender, msg.value, RECEIVE_DEFAULT_GAS_LIMIT, false, bytes(""));
     }
 
     /// @notice Accepts ETH value without triggering a deposit to L2.
@@ -357,14 +348,6 @@ contract OptimismPortal is Initializable, ResourceMetering, ISemver {
         if (success == false && tx.origin == Constants.ESTIMATION_ADDRESS) {
             revert("OptimismPortal: withdrawal failed");
         }
-    }
-
-    /// @notice Only mint once.
-    function preMint() external {
-        require(!isMinted, "OptimismPortal: minted");
-        isMinted = true;
-
-        depositTransaction_(GENESIS_ACCOUNT, MINT_AMOUNT, RECEIVE_DEFAULT_GAS_LIMIT, false, bytes(""));
     }
 
     /// @notice Accepts deposits of ETH and data, and emits a TransactionDeposited event for use in
